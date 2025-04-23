@@ -159,7 +159,7 @@ def get_match_data(sb, url):
 def main():
     links = pd.read_csv('leagues.csv')
     matches = pd.read_csv('matches_new.csv')
-    idx_start = 4453
+    idx_start = 51053
 
     with SB(uc=True) as sb:
         for i in range(idx_start, len(links)):
