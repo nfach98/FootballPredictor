@@ -159,7 +159,8 @@ def get_match_data(sb, url):
 def main():
     links = pd.read_csv('leagues.csv')
     matches = pd.read_csv('matches_new.csv')
-    idx_start = 51053
+    notes = pd.read_csv('notes.csv')
+    idx_start = 5816
 
     with SB(uc=True) as sb:
         for i in range(idx_start, len(links)):
@@ -172,8 +173,8 @@ def main():
                 matches = pd.concat([matches, df_match], ignore_index=True)
                 matches.to_csv('matches_new.csv', index=False)
             except Exception as e:
-                notes = pd.read_csv('notes.csv')
-                notes = notes.append({'index': i, 'notes': str(e)}, ignore_index=True)
+                notes_new = pd.DataFrame([{'index': i, 'notes': str(e)}])
+                notes = pd.concat([notes, notes_new], ignore_index=True)
                 notes.to_csv('notes.csv', index=False)
 
 
