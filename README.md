@@ -120,19 +120,19 @@ Solusi untuk mengatasi data-data ini adalah dengan mengisinya dengan nilai 0, se
 
 Pemeriksaan terhadap keseimbangan nilai dalam dataset perlu dilakukan untuk memastikan model tidak dibuat dari data yang cenderung pada salah satu nilai.
 
-![Grafik pemenang pertandingan](graph_winner.png)
+![Grafik pemenang pertandingan](images/graph_winner.png)
 
 Grafik di atas menunjukkan data dalam datset berdasarkan pemenang pertandingan. Dapat dilihat hampir 50% pemenang pertandingan dalam dataset adalah tim tuan rumah (*Home*), disusul tim tamu (*Away*) dan pertandingan berakhir imbang (*Draw*).
 
 Untuk membuat model yang baik perlu juga dilakukan pemeriksaan terhadap data yang di luar lingkungan dataset, biasa disebut *outlier*. Data *outlier* bisa ditangani dengan salah satu metode yaitu IQR (Inter Quartile Range). IQR bekerja dengan mengurutkan dan membagi data menjadi 4 bagian yang ditandai oleh 3 titik yang disebut kuartil (Q). Data yang digunakan adalah yang berada di antara kuartil pertama (Q1) dan kuartil ketiga (Q3).
 
-![Grafik boxplot outlier](graph_outlier.png)
+![Grafik boxplot outlier](images/graph_outlier.png)
 
 Grafik di atas adalah hasil pemeriksaan *outlier* pada tiap kolom. Terlihat cukup banyak data *outlier* pada dataset ini. Setelah *outlier* dihilangkan, tersisa 7.873 baris data yang semua kolomnya di dalam jangkauan Q1 dan Q3.
 
 Menentukan variabel mana saja yang digunakan akan sangat berpengaruh terhadap hasil dari model yang dibuat. Salah satu yang dapat dilakukan adalah memeriksa distribusi data yang dapat dibuat menggunakan visualisasi histogram.
 
-![Grafik histogram](graph_hist.png)
+![Grafik histogram](images/graph_hist.png)
 
 Grafik ini adalah grafik histogram untuk masing-masing data numerik. Beberapa hal yang dapat dipahami dari histogram ini:
 
@@ -144,7 +144,7 @@ Grafik ini adalah grafik histogram untuk masing-masing data numerik. Beberapa ha
 
 Memeriksa variabel yang berkorelasi kuat dengan hasil akhir pertandingan juga penting untuk menentukan variabel yang akan digunakan dalam pembangunan model. Visualisasi berupa matriks korelasi (*correlation matrix*) dapat digunakan untuk membantu dalam masalah ini. Berikut adalah *correlation matrix* dari setiap kolom.
 
-![Grafik korelasi](graph_correlation.png)
+![Grafik korelasi](images/graph_correlation.png)
 
 Dalam matriks ini korelasi paling kuat mempunyai nilai 1 atau -1 yang ditunjukkan dengan warna paling gelap, sedangkan korelasi mendekati 0 menunjukkan pengaruh kecil suatu variabel terhadap variabel lain.
 
@@ -260,13 +260,13 @@ Sedangkan proses *backpropagation* menyesuaikan bobot pada koneksi secara iterat
 
 Metrik *error* yang digunakan dalam perbandingan model-model yang sudah dilatih adalah root mean squared error (RMSE). Cara kerjanya dengan menghitung selisih kuadrat setiap data, lalu menghitung rata-rata dari semua selisih kuadrat. Setelah itu RMSE akan didapat dari hasil kuadrat nilai rata-rata sebelumnya *[16]*. Formula RMSE dapat dinotasikan dengan persamaan berikut.
 
-![RMSE formula](RMSE_formula.png)
+![RMSE formula](images/RMSE_formula.png)
 
 RMSE dipilih karena sesuai untuk pengukuran *error* pada data dengan distribusi normal *[17]*. Seperti yang terlihat pada grafik histogram, banyak variabel dalam dataset yang digunakan terdistribusi secara normal. Selain itu dengan mengkuadratkan selisih RMSE dapat menunjukkan *error* besar lebih baik. RMSE juga mudah dipahami karena memiliki satuan yang sama dengan variabel target. Besar RMSE mewakili berapa selisih rata-rata hasil prediksi dengan data sesungguhnya.
 
 Setelah proses pelatihan model selesai, dilakukan penghitungan RMSE untuk tiap model. Berikut adalah hasilnya.
 
-![Grafik error](graph_error.png)
+![Grafik error](images/graph_error.png)
 
 ## Referensi
 
