@@ -28,7 +28,7 @@ Sistem dengan menggunakan faktor yang tepat dapat membuat prediksi yang akurat. 
 
 ## Data Understanding
 
-[Dataset](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/matches.csv) yang digunakan dalam proyek ini adalah data pertandingan yang diperoleh dari website statistik sepakbola [FBref](https://fbref.com/en/) dengan metode scraping. Dataset berisi lebih dari 16.000 statistik pertandingan dari 5 liga top dan 2 liga kontinental Eropa, bervariasi dengan data pertandingan paling lama berasal dari musim 2015-2016 hingga 2024-2025. Berikut daftar liga yang terdapat dalam dataset.
+[Dataset](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/matches.csv) yang digunakan dalam proyek ini adalah data pertandingan yang diperoleh dari website statistik sepakbola [FBref](https://fbref.com/en/) dengan metode scraping. Dataset berisi 16.340 statistik pertandingan dari 5 liga top dan 2 liga kontinental Eropa, bervariasi dengan data pertandingan paling lama berasal dari musim 2015-2016 hingga 2024-2025. Berikut daftar liga yang terdapat dalam dataset.
 
 - Premier League (Inggris)
 - La Liga (Spanyol)
@@ -96,7 +96,17 @@ Berikut penjelasan dari seluruh kolom dalam dataset tersebut yang berjumlah 53 k
 | A_throw_ins | Jumlah lemparan ke dalam tim tamu | 16340 non-null | int64 |
 | A_long_balls | Jumlah umpan panjang tim tamu | 16340 non-null | int64 |
 
-Dataset ini memiliki 44 kolom bertipe int dan sisanya 9 kolom berupa object. Untuk melengkapi data, dibuat beberapa kolom baru dari kolom yang sudah ada. Berikut kolom yang akan dibuat.
+Dataset ini memiliki 44 kolom bertipe int dan sisanya 9 kolom berupa object.
+
+### Data balance
+
+Pemeriksaan terhadap keseimbangan nilai dalam dataset perlu dilakukan untuk memastikan model tidak dibuat dari data yang cenderung pada salah satu nilai.
+
+![Grafik pemenang pertandingan](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/graph_winner.png)
+
+Grafik di atas menunjukkan data dalam datset berdasarkan pemenang pertandingan. Dapat dilihat hampir 50% pemenang pertandingan dalam dataset adalah tim tuan rumah (*Home*), disusul tim tamu (*Away*) dan pertandingan berakhir imbang (*Draw*).
+
+Untuk melengkapi data, dibuat beberapa kolom baru dari kolom yang sudah ada. Berikut kolom yang akan dibuat.
 
 | Kolom | Penjelasan |
 |:------:|:------------:|
@@ -106,6 +116,8 @@ Dataset ini memiliki 44 kolom bertipe int dan sisanya 9 kolom berupa object. Unt
 | A_shots_percentage | Persentase tembakan akurat tim tamu |
 | A_saves_percentage | Persentase penyelamatan tim tamu |
 | A_passes_percentage | Persentase umpan akurat tim tamu |
+
+### Missing value
 
 Setelah melakukan pembuatan kolom-kolom baru ini terdapat beberapa error dalam data seperti data kosong atau data menjadi tak hingga (inf). Hal ini karena dibuat dari pembagian kolom yang sudah ada, dan terdapat beberapa data yang dibagi 0. Berikut adalah jumlah data tiap kolom yang memiliki data tidak valid.
 
@@ -118,21 +130,23 @@ Setelah melakukan pembuatan kolom-kolom baru ini terdapat beberapa error dalam d
 
 Solusi untuk mengatasi data-data ini adalah dengan mengisinya dengan nilai 0, sehingga baris yang mengandung nilai ini masih bisa digunakan dalam pembangunan model.
 
-Pemeriksaan terhadap keseimbangan nilai dalam dataset perlu dilakukan untuk memastikan model tidak dibuat dari data yang cenderung pada salah satu nilai.
+### Duplicate
 
-![Grafik pemenang pertandingan](images/graph_winner.png)
+Data duplikat perlu dihilangkan untuk mengurangi bias dari model yang dibuat. Setelah dilakukan pemeriksaan, tidak terdapat data duplikat pada dataset yang digunakan dalam proyek ini.
 
-Grafik di atas menunjukkan data dalam datset berdasarkan pemenang pertandingan. Dapat dilihat hampir 50% pemenang pertandingan dalam dataset adalah tim tuan rumah (*Home*), disusul tim tamu (*Away*) dan pertandingan berakhir imbang (*Draw*).
+### Outlier
 
 Untuk membuat model yang baik perlu juga dilakukan pemeriksaan terhadap data yang di luar lingkungan dataset, biasa disebut *outlier*. Data *outlier* bisa ditangani dengan salah satu metode yaitu IQR (Inter Quartile Range). IQR bekerja dengan mengurutkan dan membagi data menjadi 4 bagian yang ditandai oleh 3 titik yang disebut kuartil (Q). Data yang digunakan adalah yang berada di antara kuartil pertama (Q1) dan kuartil ketiga (Q3).
 
-![Grafik boxplot outlier](images/graph_outlier.png)
+![Grafik boxplot outlier](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/graph_outlier.png)
 
 Grafik di atas adalah hasil pemeriksaan *outlier* pada tiap kolom. Terlihat cukup banyak data *outlier* pada dataset ini. Setelah *outlier* dihilangkan, tersisa 7.873 baris data yang semua kolomnya di dalam jangkauan Q1 dan Q3.
 
+### Univariate analysis
+
 Menentukan variabel mana saja yang digunakan akan sangat berpengaruh terhadap hasil dari model yang dibuat. Salah satu yang dapat dilakukan adalah memeriksa distribusi data yang dapat dibuat menggunakan visualisasi histogram.
 
-![Grafik histogram](images/graph_hist.png)
+![Grafik histogram](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/graph_hist.png)
 
 Grafik ini adalah grafik histogram untuk masing-masing data numerik. Beberapa hal yang dapat dipahami dari histogram ini:
 
@@ -142,19 +156,19 @@ Grafik ini adalah grafik histogram untuk masing-masing data numerik. Beberapa ha
 
 - Data gol tim tuan rumah (H_goals) tersebar lebih merata daripada gol tim tamu (A_goals), yang mana tim tamu lebih sering mencetak 1 gol atau tidak mencetak gol. Namun jangkauan data gol tim tamu lebih besar hingga mencapai 5 gol.
 
+### Multivariate analysis
+
 Memeriksa variabel yang berkorelasi kuat dengan hasil akhir pertandingan juga penting untuk menentukan variabel yang akan digunakan dalam pembangunan model. Visualisasi berupa matriks korelasi (*correlation matrix*) dapat digunakan untuk membantu dalam masalah ini. Berikut adalah *correlation matrix* dari setiap kolom.
 
-![Grafik korelasi](images/graph_correlation.png)
+![Grafik korelasi](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/graph_correlation.png)
 
 Dalam matriks ini korelasi paling kuat mempunyai nilai 1 atau -1 yang ditunjukkan dengan warna paling gelap, sedangkan korelasi mendekati 0 menunjukkan pengaruh kecil suatu variabel terhadap variabel lain.
 
 - Beberapa variabel seperti penguasaan bola berkorelasi sangat kuat dengan data umpan dan sentuhan bola, menunjukkan variabel-variabel ini memiliki informasi yang sama yaitu tentang kontrol dan penguasaan bola.
-
 - Variabel yang memiliki korelasi sangat kuat dengan jumlah gol yaitu jumlah tembakan tepat sasaran, akurasi tembakan tepat sasaran, dan akurasi penyelamatan dari tim lawan.
-
 - Hal ini bisa dipahami karena cara untuk dapat mencetak gol adalah dengan menciptakan sebanyak mungkin tembakan, dan semakin akurat tembakan, maka akan semakin memperbesar peluang gol *[9]*. Sebaliknya tingginya akurasi penyelamatan dapat mencegah gol untuk tim lawan *[10]*, terlihat dari nilai korelasi negatif yang kuat.
 
-Untuk proyek ini setiap variabel yang memiliki korelasi minimal 0,10 baik positif maupun negatif dengan variabel H_goals atau A_goals akan digunakan di dalam model. Variabel-variabel tersebut beserta nilai korelasinya dapat dilihat pada tabel ini.
+Untuk proyek ini setiap variabel yang memiliki korelasi dengan variabel H_goals atau A_goals minimal 0,10 baik positif maupun negatif akan digunakan di dalam model. Variabel-variabel tersebut beserta nilai korelasinya dapat dilihat pada tabel ini.
 
 | Kolom | Korelasi H_goals | Korelasi A_goals |
 |:------:|:-------:|:-------:|
@@ -211,7 +225,7 @@ Random forest termasuk dalam algoritma ensemble learning, yang berarti menggabun
 
 - Akurasi lebih tinggi karena menggabungkan banyak hasil dari *decision tree*
 - Cocok untuk dataset besar
-- Mampu mengurangi *overfitting* dengan merata-ratakan hasil banyak model
+- Mampu mengurangi *overfitting* dengan menggunakan rata-rata hasil banyak model
 
 **Kekurangan:**
 
@@ -260,13 +274,60 @@ Sedangkan proses *backpropagation* menyesuaikan bobot pada koneksi secara iterat
 
 Metrik *error* yang digunakan dalam perbandingan model-model yang sudah dilatih adalah root mean squared error (RMSE). Cara kerjanya dengan menghitung selisih kuadrat setiap data, lalu menghitung rata-rata dari semua selisih kuadrat. Setelah itu RMSE akan didapat dari hasil kuadrat nilai rata-rata sebelumnya *[16]*. Formula RMSE dapat dinotasikan dengan persamaan berikut.
 
-![RMSE formula](images/RMSE_formula.png)
+![RMSE formula](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/RMSE_formula.png)
 
 RMSE dipilih karena sesuai untuk pengukuran *error* pada data dengan distribusi normal *[17]*. Seperti yang terlihat pada grafik histogram, banyak variabel dalam dataset yang digunakan terdistribusi secara normal. Selain itu dengan mengkuadratkan selisih RMSE dapat menunjukkan *error* besar lebih baik. RMSE juga mudah dipahami karena memiliki satuan yang sama dengan variabel target. Besar RMSE mewakili berapa selisih rata-rata hasil prediksi dengan data sesungguhnya.
 
 Setelah proses pelatihan model selesai, dilakukan penghitungan RMSE untuk tiap model. Berikut adalah hasilnya.
 
-![Grafik error](images/graph_error.png)
+| Model | RMSE train | RMSE test |
+|:------:|:-------:|:-------:|
+| Linear Regression | 0.591 | 0.584 |
+| Random Forest | 0.23 | 0.372 |
+| SVR | 0.343 | 0.345 |
+| MLP Regressor | 0.33 | 0.355 |
+
+![Grafik error](https://raw.githubusercontent.com/nfach98/FootballPredictor/refs/heads/main/images/graph_error.png)
+
+Dari hasil pengukuran RMSE terlihat bahwa model SVR adalah yang memiliki error test terkecil dan tidak jauh berbeda dengan error dengan dataset training. Sedangkan model Linear Regression memiliki error yang relatif jauh lebih besar dibandingkan model lainnya. Model Random Forest memiliki error pada data training yang paling kecil, namun berbeda jauh ketika diuji dengan data testing.
+
+Pengujian juga dilakukan dengan memprediksi 20 sampel data testing menggunakan keempat model. Hasil prediksi berupa 2 nilai akan dibulatkan ke bilangan terdekat sehingga menjadi skor. Berikut adalah hasilnya beserta perbandingan dengan data sesungguhnya.
+
+| y_true | LR | RF | SVR | MLP |
+|:------:|:-------:|:-------:|:-------:|:-------:|
+| **1-0** |1.07,0.63 **(1-1)**|1.11,0.07 **(1-0)**|1.10,0.00 **(1-0)**|1.16,0.00 **(1-0)**|
+| **1-1** |0.8,1.03 **(1-1)**|0.28,1.19 **(0-1)**|0.04,1.06 **(0-1)**|0.07,1.04 **(0-1)**|
+| **1-1** |1.77,1.81 **(2-2)**|1.18,1.31 **(1-1)**|1.07,1.17 **(1-1)**|1.06,1.17 **(1-1)**|
+| **3-1** |2.19,1.10 **(2-1)**|2.95,1.47 **(3-1)**|2.96,1.11 **(3-1)**|2.97,1.05 **(3-1)**|
+| **2-2** |1.00,1.89 **(1-2)**|1.08,2.02 **(1-2)**|1.10,2.10 **(1-2)**|1.22,2.20 **(1-2)**|
+| **3-1** |1.8,1.36 **(2-1)**|2.14,1.07 **(2-1)**|2.08,1.08 **(2-1)**|2.14,1.05 **(2-1)**|
+| **2-0** |2.35,-0.68 **(2--1)**|2.4,0.05 **(2-0)**|2.02,0.03 **(2-0)**|2.27,-0.06 **(2-0)**|
+| **0-2** |0.28,1.57 **(0-2)**|0.24,2.08 **(0-2)**|0.1,2.06 **(0-2)**|0.36, 2.02 **(0-2)**|
+| **0-1** |0.69,-0.37 **(1-0)**|0.19,0.04 **(0-0)**|0.11,0.06 **(0-0)**|0.44,0.07 **(0-0)**|
+| **2-2** |1.72,2.26 **(2-2)**|2.28,2.03 **(2-2)**|2.0,2.02 **(2-2)**|2.24,1.93 **(2-2)**|
+| **0-2** |-0.14,2.02 **(0-2)**|0.19,2.12 **(0-2)**|0.09,1.99 **(0-2)**|0.13,2.02 **(0-2)**|
+| **1-1** |0.88,1.47 **(1-1)**|1.19,1.26 **(1-1)**|1.08,1.07 **(1-1)**|1.37,1.16 **(1-1)**|
+| **1-0** |1.21,-0.16 **(1-0)**|1.11,0.05 **(1-0)**|1.09,0.08 **(1-0)**|1.25,0.1 **(1-0)**|
+| **0-2** |0.38,2.15 **(0-2)**|0.11,2.48 **(0-2)**|0.07,2.15 **(0-2)**|0.11,2.3 **(0-2)**|
+| **1-2** |0.9,2.49 **(1-2)**|1.2,2.22 **(1-2)**|1.01,2.1 **(1-2)**|1.0,2.07 **(1-2)**|
+| **2-0** |2.06,0.63 **(2-1)**|2.16,0.09 **(2-0)**|2.06,0.11 **(2-0)**|2.17,-0.03 **(2-0)**|
+| **0-1** |0.31,0.99 **(0-1)**|0.09,1.05 **(0-1)**|0.1,1.07 **(0-1)**|0.38,1.05 **(0-1)**|
+| **0-1** |0.19,1.52 **(0-2)**|0.04,1.1 **(0-1)**|0.05,1.06 **(0-1)**|0.03,1.27 **(0-1)**|
+| **0-1** |0.79,1.16 **(1-1)**|0.41,1.25 **(0-1)**|0.07,1.07 **(0-1)**|0.17,1.14 **(0-1)**|
+| **2-3** |1.58,2.63 **(2-3)**|1.96,3.2 **(2-3)**|2.05,3.08 **(2-3)**|2.25,3.03 **(2-3)**|
+
+Setelah diuji dan dibandingkan, akan dihitung berapa jumlah prediksi skor yang tepat dari setiap model dan persentase akurasi dari pengujian 20 sampel di atas. Berikut adalah jumlah prediksi benar dari masing-masing model.
+
+| Model | Jumlah prediksi benar | Akurasi (dari 20 sampel) |
+|:------:|:-------:|:-------:|
+| Linear Regression | 10 | 50% |
+| Random Forest | 16 | 80% |
+| SVR | 16 | 80% |
+| MLP Regressor | 16 | 80% |
+
+Hasil ini menunjukkan performa model Linear Regression yang jauh di bawah model lainnya dengan hanya 10 dari 20 prediksi yang tepat. Sedangkan 3 model lain bersaing dengan akurasi yang sama yaitu 80%. Jika mempertimbangkan jumlah error, model Random Forest memiliki performa yang jauh berbeda saat training dan testing dengan selisih 0,14. Model MLP Regressor terlihat lebih baik dengan perbedaan error training dan testing yang hanya 0,025. Namun SVR jauh lebih baik dengan perbedaan error yang sangat kecil pada 2 proses itu.
+
+Dengan memiliki RMSE terkecil, performa yang hampir tidak berbeda ketika proses training dan testing, serta kemampuan memprediksi 80% skor secara tepat, dapat ditarik kesimpulan model SVR adalah model terbaik dalam proyek ini.
 
 ## Referensi
 
